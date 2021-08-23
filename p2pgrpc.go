@@ -32,13 +32,16 @@ func NewGRPCProtocol(ctx context.Context, host host.Host) *GRPCProtocol {
 	}
 	host.SetStreamHandler(Protocol, grpcProtocol.HandleStream)
 	// Serve will not return until Accept fails, when the ctx is canceled.
-	go grpcServer.Serve(newGrpcListener(grpcProtocol))
 	return grpcProtocol
 }
 
 // GetGRPCServer returns the grpc server.
 func (p *GRPCProtocol) GetGRPCServer() *grpc.Server {
 	return p.grpcServer
+}
+
+func (p *GRPCProtocol) Serve() error {
+	return p.grpcServer.Serve(newGrpcListener(p))
 }
 
 // HandleStream handles an incoming stream.
