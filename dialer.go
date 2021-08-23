@@ -41,6 +41,6 @@ func (p *GRPCProtocol) Dial(
 	peerID peer.ID,
 	dialOpts ...grpc.DialOption,
 ) (*grpc.ClientConn, error) {
-	dialOpsPrepended := append([]grpc.DialOption{p.GetDialOption(ctx)}, dialOpts...)
+	dialOpsPrepended := append([]grpc.DialOption{p.GetDialOption()}, dialOpts...)
 	return grpc.DialContext(ctx, peerID.Pretty(), dialOpsPrepended...)
 }
