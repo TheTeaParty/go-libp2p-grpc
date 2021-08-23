@@ -2,9 +2,9 @@ package p2pgrpc
 
 import (
 	"context"
+	"fmt"
 	"github.com/libp2p/go-libp2p-core/peer"
 	ps "github.com/libp2p/go-libp2p-peerstore"
-	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"net"
 )
@@ -15,7 +15,7 @@ func (p *GRPCProtocol) GetDialOption() grpc.DialOption {
 	return grpc.WithContextDialer(func(ctx context.Context, peerIdStr string) (net.Conn, error) {
 		id, err := peer.Decode(peerIdStr)
 		if err != nil {
-			return nil, errors.WithMessage(err, "grpc tried to dial non peer-id")
+			return nil, fmt.Errorf("grpc tried to dial non peer-id: %w", err)
 		}
 
 		err = p.host.Connect(ctx, ps.PeerInfo{
