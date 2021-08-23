@@ -2,28 +2,23 @@ package p2pgrpc
 
 import (
 	"context"
-	"net"
-	"time"
-
-	peer "github.com/libp2p/go-libp2p-core/peer"
+	"github.com/libp2p/go-libp2p-core/peer"
 	ps "github.com/libp2p/go-libp2p-peerstore"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+	"net"
 )
 
 // GetDialOption returns the WithDialer option to dial via libp2p.
 // note: ctx should be the root context.
-func (p *GRPCProtocol) GetDialOption(ctx context.Context) grpc.DialOption {
-	return grpc.WithDialer(func(peerIdStr string, timeout time.Duration) (net.Conn, error) {
-		subCtx, subCtxCancel := context.WithTimeout(ctx, timeout)
-		defer subCtxCancel()
-
+func (p *GRPCProtocol) GetDialOption() grpc.DialOption {
+	return grpc.WithContextDialer(func(ctx context.Context, peerIdStr string) (net.Conn, error) {
 		id, err := peer.Decode(peerIdStr)
 		if err != nil {
 			return nil, errors.WithMessage(err, "grpc tried to dial non peer-id")
 		}
 
-		err = p.host.Connect(subCtx, ps.PeerInfo{
+		err = p.host.Connect(ctx, ps.PeerInfo{
 			ID: id,
 		})
 		if err != nil {
